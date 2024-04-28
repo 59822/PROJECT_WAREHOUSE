@@ -44,180 +44,98 @@ class System(Usuario):
         elif self.vinculation == "Personal": #Revisar x2 ok
             return f"Personal vinculated. Welcome to the system {self._name}!. \n You will be redirected to the personal base."
         
-class WareHouse:
-    def __init__(self, code: str, line: str, quantity: int, description: str):
-        self._code = code
-        self._line = line
-        self._quantity = quantity
-        self._description = description
-        self._providers = []  # List to store instances of Provider
-        self._associated_brands = []  # List to store associated brands
-        self._personal_positions = []  # List to store personal positions
-
-    def add_provider(self, provider: Provider):
-        self._providers.append(provider)
-
-    def add_associated_brand(self, brand: str):
-        self._associated_brands.append(brand)
-
-    def add_personal_position(self, position: str):
-        self._personal_positions.append(position)
-
-class Producto:
-    def __init__(self, nombre, cantidad, provider, id_provider, description, precio_personal, precio_mayorista):
-        self.nombre = nombre
-        self.cantidad = cantidad  ##Aqui vemos si lo hacemos privado o no, protegido o no
-        self.provider = provider
-        self.id_provider = id_provider
-        self.description = description
-        self.precio_personal = precio_personal
-        self.precio_mayorista = precio_mayorista
+class Product:
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand=None):
+        self.name = name
+        self.quantity = quantity
+        self.set_provider(provider, id_provider)
+        self.set_description(description)
+        self.set_price(price_personal, price_wholesale)
+        self.brand = brand  # Brand is optional and can be None
 
     def __str__(self):
-        return f"{self.nombre}: {self.cantidad} unidades".
-
+        return f"{self.name}: {self.quantity} units"
 
     def set_provider(self, provider, id_provider):
         if isinstance(provider, str) and isinstance(id_provider, int):
             self.provider = provider
             self.id_provider = id_provider
         else:
-            raise TypeError("El proveedor debe ser una cadena de caracteres y el ID del proveedor debe ser un entero.")
+            raise TypeError("Provider must be a string and provider ID must be an integer.")
     
     def get_provider(self):
-        return self._provider
+        return self.provider
     
     def set_description(self, description):
-        self._description = description
+        self.description = description
     
     def get_description(self):
-        return self._description
+        return self.description
     
-    def set_price(self, personal, mayorista):
-        if isinstance(personal, (int, float)) and isinstance(mayorista, (int, float)):
-            self.precio_personal = personal
-            self.precio_mayorista = mayorista
+    def set_price(self, personal, wholesale):
+        if isinstance(personal, (int, float)) and isinstance(wholesale, (int, float)):
+            self.price_personal = personal
+            self.price_wholesale = wholesale
         else:
-            raise TypeError("Los precios deben ser números enteros o decimales.")
+            raise TypeError("Prices must be integers or decimals.")
 
-    def get_price_mayorista(self):
-        return self.precio_mayorista
+    def get_price_wholesale(self):
+        return self.price_wholesale
     
     def get_price_personal(self):
-        return self.precio_personal
-    
-class Agenda(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
+        return self.price_personal
+
+class Agenda(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+
+class Color(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, color):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.color = color
+
+class Micropoint(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, point_type, color):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.point_type = point_type
+        self.color = color
+        
+class Corrector(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
 
 
-class Color(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
-        self.color = None
+class Eraser(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
 
 
-class Micropunta(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
+class SewingMachine(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
 
 
-class Corrector(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
+class Notebook(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, format, sheets):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.format = format
+        self.sheets = sheets
 
 
-class Borrador(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
+class Pen(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, color):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.color = color
 
 
-class Cosedora(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
-        self.linea = None
+class GeometrySet(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
 
 
-class Cuaderno(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
-        self.tamano = None
-
-
-class Esfero(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
-
-
-class JuegoGeometrica(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
-
-
-class Lapiz(Producto):
-    def __init__(self, nombre, cantidad, codigo, proveedor, marca, descripcion, personal, mayorista):
-        super().__init__(nombre, cantidad)
-        self.codigo = codigo
-        self.proveedor = proveedor
-        self.marca = marca
-        self.descripcion = descripcion
-        self.precio_personal = personal
-        self.precio_mayorista = mayorista
-
+class Pencil(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
 
 class SistemaProductos:
     def __init__(self):
@@ -246,18 +164,17 @@ class SistemaProductos:
         for usuario in self.usuarios:
             print(usuario.nombre, usuario.email, usuario.rol)
             
-producto1 = Producto("Lápiz", 100, "Proveedor1", 123, "Lápiz de grafito", 0.5, 0.3)
+            
+            
+'''producto1 = Producto("Lápiz", 100, "Proveedor1", 123, "Lápiz de grafito", 0.5, 0.3)
 
 print("Precio personal actual:", producto1.precio_personal)
 print("Precio mayorista actual:", producto1.precio_mayorista)
 
-# Intentando cambiar los precios con un tipo de dato incorrecto
 try:
     producto1.set_price("0.5", 0.3)
 except TypeError as e:
     print("Error:", e)
-
-# Cambiando los precios correctamente
 producto1.set_price(0.6, 0.4)
 print("Precio personal actualizado:", producto1.precio_personal)
-print("Precio mayorista actualizado:", producto1.precio_mayorista)
+print("Precio mayorista actualizado:", producto1.precio_mayorista)'''

@@ -1,187 +1,216 @@
-# Programación Orientada a Objetos - UNAL
+# Proyecto
 
-## Clase 11: Modulos y Paquetes
+## Warehouse
 
-En Python, a medida que los proyectos crecen, se vuelve necesario organizar el código en módulos y paquetes para facilitar su mantenimiento y legibilidad.
+Yo se que esta en español, pero luego lo cambiamos a ingles
 
-### Modulos
-Un módulo es un archivo Python que contiene definiciones de clases, funciones y variables. Es la unidad básica de organización del código en Python.
+### Instrucción del código
+En este caso, como pueden observar en primer lugar tenemos una clase que define al usuario, el objetivo es que se almacenen los usuarios y con su categoria puedan acceder a ver la base, a modificarla aumentando o disminuyendo 
+
 
 ```python 
-class MyClass:
-  def __init__(self, nombre):
-    self.nombre = nombre
+class Usuario:
+    def __init__(self, name: str, phone: str, email: str, password: str, user_name: str):
+        self._name = name
+        self._phone = phone
+        self._email = email #Protected attribute
+        self.__password = None #Private attribute
+        self.user_name = user_name #Public attribute
+    
+    def set_password(self, password):
+        if (len(password) < 10 and any(char.isupper()) for char in password and any(char.islower() for char in password)):
+            raise ValueError("The password must have at least 8 characters. And at least one uppercase and one lowercase letter.")
+        else:
+            self.__password = password
+        
+    def get_password(self):
+        return "The password is protected"
+    
+    def vinculation(self, vinculation):
+        self.vinculation = vinculation
+        
 
-  def greet(self):
-    print(f"Hola, mi nombre es {self.nombre}")
+class Provider(Usuario):
+    def __init__(self, email: str, password: str, associated_brand: str):
+        super().__init__(email, password)
+        self.associated_brand = associated_brand
+        
+        
+class Personal(Usuario):
+    def __init__(self, email: str, password: str, personal_position: str):
+        super().__init__(email, password)
+        self.personal_position = personal_position
+        
+     
+class System(Usuario):
+    def __init__(self, email: str, password: str, vinculation: str):
+        super().__init__(email, password)
+        self.vinculation = vinculation
+        
+    def vinculation(self, vinculation):
+        if self.vinculation == "Client": ##Revisar para que valide en todos formatos, upper, lower or capital
+            return f"Client vinculated. Welcome to the system {self._name}!. \n Enjoy your searching buy."
+        elif self.vinculation == "Provider": #Revisar x2 ok
+            return f"Provider vinculated. Welcome to the system {self._name}!. \n You will be redirected to our provider base."
+        elif self.vinculation == "Personal": #Revisar x2 ok
+            return f"Personal vinculated. Welcome to the system {self._name}!. \n You will be redirected to the personal base."
+        
+```
+Aquí practicamente busco que se con su vinculación pueda acceder, pero no se si tenga que hacer algo tipo otro archivo.
+### Pendiente ok
+1. Queda pendiente si son de caracter privado, publico o la otra q no me acuerdo ok
+2. Redirigir al usuario de acuerdo a su categoria 
 
-def my_function(argumento):
-  print(f"La función recibió el argumento: {argumento}")
-```
 
-### Paquetes
-Un paquete es una colección de módulos relacionados que se agrupan en una carpeta. Para que una carpeta se considere un paquete, debe contener un archivo especial llamado `__init__.py`.
-
-```
-estructura_archivos/
-├── paquete/
-│   ├── __init__.py
-│   ├── modulo1.py
-│   └── modulo2.py
-└── main.py
-```
-
-**Ejemplo:**
-```
-estructura_archivos/
-├── paquete/
-│   ├── __init__.py
-│   ├── saludar.py
-│   └── despedirse.py
-└── main.py
-```
 
 ```python 
-# main.py
-import paquete.saludar as saludar
-import paquete.despedirse as despedirse
+       
+class Product:
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand=None):
+        self.name = name
+        self.quantity = quantity
+        self.set_provider(provider, id_provider)
+        self.set_description(description)
+        self.set_price(price_personal, price_wholesale)
+        self.brand = brand  # Brand is optional and can be None
 
-def main():
-  nombre = "Juan"
-  saludo = saludar.Saludar(nombre)
-  despedida = despedirse.Despedirse(nombre)
-  print(saludo.saludar_casual())
-  print(saludo.saludar_formal())
-  print(saludo.saludar_educado())
-  print(saludo.saludar_cordial())
-  print(despedida.despedirse_formal())
-  print(despedida.despedirse_casual())
-  print(despedida.despedirse_educado())
-  print(despedida.despedirse_cordial())
+    def __str__(self):
+        return f"{self.name}: {self.quantity} units"
 
-if __name__ == "__main__":
-  main()  
+    def set_provider(self, provider, id_provider):
+        if isinstance(provider, str) and isinstance(id_provider, int):
+            self.provider = provider
+            self.id_provider = id_provider
+        else:
+            raise TypeError("Provider must be a string and provider ID must be an integer.")
+    
+    def get_provider(self):
+        return self.provider
+    
+    def set_description(self, description):
+        self.description = description
+    
+    def get_description(self):
+        return self.description
+    
+    def set_price(self, personal, wholesale):
+        if isinstance(personal, (int, float)) and isinstance(wholesale, (int, float)):
+            self.price_personal = personal
+            self.price_wholesale = wholesale
+        else:
+            raise TypeError("Prices must be integers or decimals.")
+
+    def get_price_wholesale(self):
+        return self.price_wholesale
+    
+    def get_price_personal(self):
+        return self.price_personal
+
+class Agenda(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+
+class Color(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, color):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.color = color
+
+class Micropoint(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, point_type, color):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.point_type = point_type
+        self.color = color
+        
+class Corrector(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+
+
+class Eraser(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+
+
+class SewingMachine(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+
+
+class Notebook(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, format, sheets):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.format = format
+        self.sheets = sheets
+
+
+class Pen(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand, color):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+        self.color = color
+
+
+class GeometrySet(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+
+
+class Pencil(Product):
+    def __init__(self, name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand):
+        super().__init__(name, quantity, provider, id_provider, description, price_personal, price_wholesale, brand)
+
 ```
 
-```python 
-# saludar.py
-class Saludar():
-  def __init__(self, nombre:str):
-      self.nombre = nombre
-  def saludar_casual(self):
-    return f"Hola {self.nombre}"
-  def saludar_formal(self):
-    return f"Buenos días {self.nombre}"
-  def saludar_educado(self):
-    return f"Un placer saludarte {self.nombre}"
-  def saludar_cordial(self):
-    return f"Que gusto verte {self.nombre}" 
-```
+### Observacion
 
-```python 
-# despedirse.py
-class Despedirse:
-  def __init__(self, nombre:str):
-    self.nombre  = nombre
-  
-  def despedirse_formal(self):
-    return f"Adios {self.nombre}"
-  
-  def despedirse_casual(self):
-    return f"Chao {self.nombre}"
-  
-  def despedirse_educado(self):
-    return f"Hasta luego {self.nombre}"
-  
-  def despedirse_cordial(self):
-    return f"Nos vemos {self.nombre}" 
-```
+Aquí en este codigo solo se despliega las clases y sus clasificaciones
 
-### Ventajas de usar paquetes
+### Pendiente
+1. Saber como se van a unir los datos con un texto que pensaba que fuera JSON
+2. Generar el sistema de productos que es un fichero a parte pq pues se ve medio feo ahi o no se 
 
-- **Organización**: Permite dividir el código en unidades más pequeñas y manejables.
-- **Reutilización**: Facilita la reutilización de código en diferentes proyectos.
-- **Mantenimiento**: Simplifica el mantenimiento y la actualización del código.
-- **Legibilidad**: Mejora la legibilidad y comprensión del código.
+``` python 
 
+class SistemaProductos:
+    def __init__(self):
+        self.productos = []
+        self.usuarios = []
 
-## Tipos de imports
-### Imports Absolutos
-Los imports absolutos especifican el camino completo desde el directorio raíz del proyecto hasta el módulo que deseas importar. Son preferidos por su claridad y son recomendados por PEP 8 cuando no provocan expresiones demasiado largas.
+    def agregar_producto(self, producto):
+        self.productos.append(producto)
 
-**Ejemplo:** Teniendo en cuenta el siguiente paquete:
+    def mostrar_productos(self):
+        for producto in self.productos:
+            print(producto)
 
- ```mermaid
-classDiagram
-    class Database {
-        +connect()
-    }
-    class Product {
-        -db Database
-        +query()
-    }
-    Database <|-- Product: uses
-```
+    def buscar_producto(self, nombre):
+        for producto in self.productos:
+            if producto.nombre == nombre:
+                return producto
+        return None
 
-```
-ecommerce/
-│   __init__.py
-│   main.py
-│
-├── database/
-│   │   __init__.py
-│   │   database.py
-│
-└── products/
-    │   __init__.py
-    │   products.py
+    def registrar_usuario(self, nombre, email, rol):
+        usuario = Usuario(nombre, email, rol)
+        self.usuarios.append(usuario)
+        print(f"Usuario {nombre} registrado como {rol}.")
+
+    def mostrar_usuarios(self):
+        for usuario in self.usuarios:
+            print(usuario.nombre, usuario.email, usuario.rol)
+            
 
 ```
 
+### Observacion
+No le hagan caso a eso pq me quede en blanco intentando unirlo. Pero es el que quiero integrar en u fichero aparte ok 
 
-```python
-# import absoluto
-from ecommerce.database.database import Database
-```
+### Pendiente
+1. Integrarlo a fichero a parte
 
-### Imports Relativos
-Los imports relativos utilizan puntos para indicar el módulo actual o el directorio de paquetes. Son útiles para importar entre paquetes y módulos dentro de una misma aplicación sin necesidad de nombrar el paquete raíz.
 
-**Ejemplo:**
-```python
-# import relativo
-from .database import Database
-```
+# General
+La verdad me mori, luego ya intent unir todo el codigo pero ahi estarian las bases. 
 
-### Recomendaciones:
-- Mantener los imports al principio del archivo, justo después de cualquier comentario o cadena de documentación.
-- Agrupar los imports en el siguiente orden: bibliotecas estándar, bibliotecas de terceros y finalmente, aplicaciones o bibliotecas locales.
-- Separar cada grupo de imports con una línea en blanco.
-- De preferencia usar imports absolutos a relativos, ya que son más legibles y tienden a ser mejores mantenidos.
-
-## El famoso ` __name__ == "__main__"`
-Esta estructura se utiliza para determinar si el script está siendo ejecutado como el programa principal o si ha sido importado como un módulo en otro script. Esto es útil para proporcionar dos comportamientos diferentes: uno cuando el módulo es ejecutado directamente, y otro cuando es importado.
-
-Cuando Python ejecuta un archivo, antes de ejecutar el código, define algunas variables especiales. `__name__` es una de esas variables. Si el archivo es el punto de entrada principal, Python establece `__name__` igual a `__main__`. Si el archivo está siendo importado desde otro módulo, `__name__` se establece al nombre del archivo/módulo.
-
-**Ejemplo:**
-```python
-# script.py
-def funcion_principal():
-    print("Función principal ejecutándose")
-
-def otra_funcion():
-    print("Otra función ejecutándose")
-
-if __name__ == "__main__":
-    funcion_principal()
-```
-Al ejecutar script.py directamente, verás el mensaje de funcion_principal. Pero si importas script.py en otro módulo, por ejemplo con import script, funcion_principal no se ejecutará automáticamente, evitando efectos secundarios no deseados en el módulo importador.
-
-**Utilidad:** Esta característica permite que un módulo ejecute algún código de inicialización (como probar funciones o clases) solo cuando se está ejecutando como el programa principal. Esto evita que el código de prueba o inicialización se ejecute cuando el módulo se importa en otro script.
-
-## Reto 5: 
-1. Create a package with all code of class *Shape*, this exersice should be conducted in two ways:
- - A unique module inside of package *Shape*
- - Individual modules that import *Shape* in inheritates from it.
-
+1. Los objetos los podriamos integrar en otro fichero para q no quede tan largo el proyecto
+2. Utilice lo de raise y esa vaina, tambien lo del encapsulamiento pero no se q opinen
+3. Están los setters y getters 
+4. Me gustaria hacer la base de datos en JSON, pero luego vemos okey. Cualquier cosa me escriben xd
